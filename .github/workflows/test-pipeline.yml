@@ -26,4 +26,5 @@ jobs:
 
       - name: Run backend and API verification tests
         run: |
-          pytest
+          python test_app.py
+          python -m pytest test_api.py
