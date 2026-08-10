@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TikTok Payout Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #0f172a; color: #f8fafc; padding: 40px; }
+        .card { background: #1e293b; padding: 20px; border-radius: 8px; max-width: 400px; margin-bottom: 20px; }
+        input, select, button { width: 100%; padding: 10px; margin-top: 10px; border-radius: 4px; border: none; }
+        button { background: #3b82f6; color: white; font-weight: bold; cursor: pointer; }
+        button:hover { background: #2563eb; }
+    </style>
+</head>
+<body>
+    <h1>TikTok Payout Platform</h1>
+
+    <div class="card">
+        <h3>1. Register Account</h3>
+        <input type="text" id="regUser" placeholder="Username">
+        <select id="regCountry">
+            <option value="Nigeria">Nigeria</option>
+            <option value="Abroad">Abroad</option>
+        </select>
+        <button onclick="registerUser()">Register</button>
+    </div>
+
+    <div class="card">
+        <h3>2. Simulate Video View ($10)</h3>
+        <input type="text" id="viewUser" placeholder="Username">
+        <button onclick="logView()">Watch Video</button>
+    </div>
+
+    <script>
+        const API_URL = "http://127.0.0.1:8000";
+
+        async function registerUser() {
+            const username = document.getElementById('regUser').value;
+            const country = document.getElementById('regCountry').value;
+            const res = await fetch(`${API_URL}/api/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, country })
+            });
+            const data = await res.json();
+            alert(JSON.stringify(data));
+        }
+
+        async function logView() {
+            const username = document.getElementById('viewUser').value;
+            const res = await fetch(`${API_URL}/api/video/view`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username })
+            });
+            const data = await res.json();
+            alert(JSON.stringify(data));
+        }
+    </script>
+</body>
+</html>
