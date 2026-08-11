@@ -5,13 +5,17 @@ from app_core import TikTokAppBackendEngine
 app = FastAPI(title="TikTok Automation Backend")
 engine = TikTokAppBackendEngine()
 
-API_KEY = "my_secret_backend_key_123"  # In production, load this from environment variables
+API_KEY = "my_secret_backend_key_123"
 api_key_header = APIKeyHeader(name="X-API-Key", auto_error=True)
 
 def verify_api_key(api_key: str = Security(api_key_header)):
     if api_key != API_KEY:
         raise HTTPException(status_code=403, detail="Could not validate credentials / Invalid API Key")
     return api_key
+
+@app.get("/")
+def read_root():
+    return {"message": "TikTok Automation Backend is running"}
 
 @app.post("/register")
 def register(username: str, country: str, api_key: str = Security(verify_api_key)):
