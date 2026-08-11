@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: tiktok-auto-pipeline
+    env: docker
+    plan: free
+    buildCommand: ""
+    envVars:
+      - key: API_KEY
+        value: my_secret_backend_key_123
