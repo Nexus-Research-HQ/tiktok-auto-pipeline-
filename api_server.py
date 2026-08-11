@@ -1,43 +1,26 @@
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+from fastapi import FastAPI, HTTPException, Security, Header
+from fastapi.security.api_key import APIKeyHeader
 from app_core import TikTokAppBackendEngine
 
-app = FastAPI()
+app = FastAPI(title="TikTok Automation Backend")
 engine = TikTokAppBackendEngine()
 
-class UserRegister(BaseModel):
-    username: str
-    country: str
+API_KEY = "my_secret_backend_key_123"  # In production, load this from environment variables
+api_key_header = APIKeyHeader(name="X-API-Key", auto_error=True)
 
-class WithdrawalRequest(BaseModel):
-    username: str
-    method: str
-    destination: str
-
-@app.get("/")
-def read_root():
-    return {"status": "online", "service": "TikTok Backend Engine"}
+def verify_api_key(api_key: str = Security(api_key_header)):
+    if api_key != API_KEY:
+        raise HTTPException(status_code=403, detail="Could not validate credentials / Invalid API Key")
+    return api_key
 
 @app.post("/register")
-def register_user(data: UserRegister):
-    try:
-        result = engine.register_user(data.username, data.country)
-        return result
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+def register(username: str, country: str, api_key: str = Security(verify_api_key)):
+    return engine.register_user(username, country)
 
 @app.post("/view")
-def log_view(username: str):
-    try:
-        result = engine.log_video_view(username)
-        return result
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+def log_view(username: str, api_key: str = Security(verify_api_key)):
+    return engine.log_video_view(username)
 
 @app.post("/withdraw")
-def withdraw(data: WithdrawalRequest):
-    try:
-        result = engine.process_withdrawal(data.username, data.method, data.destination)
-        return result
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+def withdraw(username: str, method: str, destination: str, api_key: str = Security(verify_api_key)):
+    return engine.process_withdrawal(username, method, destination)
